@@ -4,9 +4,10 @@ import os
 import csv 
 import xml.etree.ElementTree as ET 
 
-dataDir = "uspanteko_corpus_xml"
+corpusDir = "uspanteko_corpus_xml"
+dataDir = "data_for_analysis"
 
-xmlFiles = os.listdir(dataDir)
+xmlFiles = os.listdir(corpusDir)
 
 def parseXML(xmlfile): 
 	pass
