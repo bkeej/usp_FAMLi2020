@@ -4,10 +4,17 @@ import os
 import csv 
 import xml.etree.ElementTree as ET 
 
+#Files and Directories
+
 corpusDir = "uspanteko_corpus_xml/"
 dataDir = "data_for_analysis/"
 
 xmlFiles = os.listdir(corpusDir)
+
+# Tags of interest
+
+verbTags = ["VT", "VI"]
+
 
 def parseXML(xmlfile): 
 	tree = ET.parse(xmlfile) 
