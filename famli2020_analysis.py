@@ -13,7 +13,7 @@ xmlFiles = os.listdir(corpusDir)
 
 # Parsers
 
-## Takes and IGT-XML file and returns a list of phrase ids of phrases that have adjencts verbs (VI / VT)
+## Takes and IGT-XML file and returns a list of phrase ids of phrases that have adjacent verbs (ie., VI / VT)
 def parseVV(xmlfile): 
 	verbTags = ["VT", "VI"]
 	pharseMatch = []
