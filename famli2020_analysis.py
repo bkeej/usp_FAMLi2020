@@ -20,17 +20,20 @@ xml_files = os.listdir(corpus_dir)
 
 # # NOTE: Maybe we can be more general by skipping intermediate entries with an origin class. 
 # # Verbs don't have origin class in XML scheme
-# def vv_match(phrase):
-# 	verb_tags = ["VT", "VI"]
-# 	pos = phrase.findall("//pos") #return all pos tags under phrase
-# 	for p in pos:
-# 		if p.get("orig_cls") != None:
-# 			pass
-# 		else:
-# 			pos.remove(p)
-# 	for p, p' in zip(pos, pos[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
-# 		if x.get("text") in verb_tags and y.get("text") in verb_tags: # True if adjacent verb tags
-			
+def vv_match(phrase):
+	verb_tags = ["VT", "VI"]
+	matches = []
+	pos = phrase.findall("pos") #return all pos tags under phrase
+	for p in pos:
+		if p.get("orig_cls") != None:
+			pass
+		else:
+			pos.remove(p)
+	for p1, p2 in zip(pos, pos[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
+		if p1.get("text") in verb_tags and p2.get("text") in verb_tags: # True if adjacent verb tags
+			matches.append((p1,p2))
+	return matches
+
 
 ## Takes an IGT-XML file and returns a list of dictionaries characterizing 
 ## sentences with adjacent verbs prepped for adding to CSV.
@@ -40,13 +43,16 @@ def parse_vv(xmlfile):
 	tree = ET.parse(xmlfile) 
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
-		for x, y in zip(phrase, phrase[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
-			if x.get("text") in verb_tags and y.get("text") in verb_tags: # True if adjacent verb tags
+	# 	for x, y in zip(phrase, phrase[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
+	# 		if x.get("text") in verb_tags and y.get("text") in verb_tags: # True if adjacent verb tags
+		matches = vv_match(phrase)
+		if len(matches) > 0:
+			for m in matches:
 				row = {"tx_title": None, "phrase_id": None, "v1": None, "v2": None, "sentence": None, "translation": None}
 				row["tx_title"] = root.get("title")
 				row["phrase_id"] = phrase.get("ph_id")
-				row["v1"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + x.get("morph_ref") + "']").get("text") 
-				row["v2"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text")
+				row["v1"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + m[0].get("morph_ref") + "']").get("text") 
+				row["v2"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + m[1].get("morph_ref") + "']").get("text")
 				row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text.strip()
 				row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text.strip()
 				rows.append(row)
