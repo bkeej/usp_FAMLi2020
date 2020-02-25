@@ -44,16 +44,13 @@ def parse_no_pers(xmlfile):
 # Saving analysis 
 #
 
-# Takes a phrase object and returns a list of string to write to CSV 
+# Takes a phrase object and returns a list of strings to write to CSV 
 def vv_to_row(phrase):
 	pass
 
-# Takes a phrase object and returns a list of string to write to CSV
+# Takes a phrase object and returns a list of strings to write to CSV
 def no_pers_to_row(phrase):
 	pass
-
-def save_to_csv(file,rower):
-	with open(data_dir + file, mode 'w') as dataFile:
 
 
 #
