@@ -39,14 +39,20 @@ def parse_vv(xmlfile):
 
 ## Takes an IGT-XML file and returns a list of phrase objects with transitive verbs, but no person-marking.
 def parse_no_pers(xmlfile):
-	parse_match = []
+	rows = []
 	tree = ET.parse(xmlfile) 
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
 		for x, y in zip(phrase, phrase[1:]): # trick to get adject pairs in phrase, i.e., pos tags
-			if y.get("text") == "VT" and not x.get("text") == "PERS": # True if any VT ever not follows PERS
-				parse_match.append(phrase.get("ph_id"))
-	return parse_match
+			if y.get("text") == "VT" and x.get("text") != "PERS": # True if any VT ever not follows PERS
+				row = {"tx_title": None, "phrase_id": None, "v": None, "sentence": None, "translation": None}
+				row["tx_title"] = root.get("title")
+				row["phrase_id"] = phrase.get("ph_id")
+				row["v"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text") 
+				row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text
+				row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text
+				rows.append(row)
+	return rows
 
 #
 # Main
@@ -55,7 +61,8 @@ def parse_no_pers(xmlfile):
 test = corpus_dir + xml_files[0]
 
 def main():
-	print parse_vv(test)
+	# print parse_vv(test)
+	print parse_no_pers(test)
 
 if __name__ == "__main__":
 	main() 
