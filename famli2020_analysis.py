@@ -17,17 +17,25 @@ xml_files = os.listdir(corpus_dir)
 # Parsers
 #
 
-## Takes an IGT-XML file and returns a list of phrase objects that have adjacent verbs (ie., VI / VT)
+## Takes an IGT-XML file and returns a list of dictionaries characterizing 
+## sentences with adjacent verbs prepped for adding to CSV.
 def parse_vv(xmlfile): 
 	verb_tags = ["VT", "VI"]
-	parse_match = []
+	rows = []
 	tree = ET.parse(xmlfile) 
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
 		for x, y in zip(phrase, phrase[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
 			if x.get("text") in verb_tags and y.get("text") in verb_tags: # True if adjacent verb tags
-				parse_match.append(phrase.get("ph_id"))
-	return parse_match
+				row = {"tx_title": None, "phrase_id": None, "v1": None, "v2": None, "sentence": None, "translation": None}
+				row["tx_title"] = root.get("title")
+				row["phrase_id"] = phrase.get("ph_id")
+				row["v1"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + x.get("morph_ref") + "']").get("text") 
+				row["v2"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text")
+				row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text
+				row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text
+				rows.append(row)
+	return rows 
 
 ## Takes an IGT-XML file and returns a list of phrase objects with transitive verbs, but no person-marking.
 def parse_no_pers(xmlfile):
@@ -41,19 +49,6 @@ def parse_no_pers(xmlfile):
 	return parse_match
 
 #
-# Saving analysis 
-#
-
-# Takes a phrase id and returns a list of strings to write to CSV 
-def vv_to_row(phrase):
-	pass
-
-# Takes a phrase id and returns a list of strings to write to CSV
-def no_pers_to_row(phrase):
-	pass
-
-
-#
 # Main
 #
 
@@ -61,7 +56,6 @@ test = corpus_dir + xml_files[0]
 
 def main():
 	print parse_vv(test)
-	print parse_no_pers(test)
 
 if __name__ == "__main__":
 	main() 
