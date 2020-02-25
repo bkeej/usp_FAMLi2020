@@ -4,14 +4,18 @@ import os
 import csv 
 import xml.etree.ElementTree as ET 
 
+#
 # Files and Directories
+#
 
 corpusDir = "uspanteko_corpus_xml/"
 dataDir = "data_for_analysis/"
 
 xmlFiles = os.listdir(corpusDir)
 
+#
 # Parsers
+#
 
 ## Takes and IGT-XML file and returns a list of phrase ids of phrases that have adjacent verbs (ie., VI / VT)
 def parseVV(xmlfile): 
@@ -25,8 +29,6 @@ def parseVV(xmlfile):
 				pharseMatch.append(phrase.get("ph_id"))
 	return pharseMatch
 
-# Saving analysis
-
 ## Takes and IGT-XML file and returns a list of phrase ids of phrases transitive verbs, but no person-marking.
 def parseNoPers(xmlfile):
 	pharseMatch = []
@@ -38,10 +40,16 @@ def parseNoPers(xmlfile):
 				pharseMatch.append(phrase.get("ph_id"))
 	return pharseMatch
 
+#
+# Saving analysis 
+#
+
 def savetoCSV():
 	pass
 
+#
 # Main
+#
 
 test = corpusDir + xmlFiles[0]
 
