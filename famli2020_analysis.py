@@ -38,6 +38,7 @@ def parse_vv(xmlfile):
 	return rows 
 
 ## Takes an IGT-XML file and returns a list of phrase objects with transitive verbs, but no person-marking.
+## CHECK: THIS MIGHT BE RETURNING SOME FALSE POSITIVES
 def parse_no_pers(xmlfile):
 	rows = []
 	tree = ET.parse(xmlfile) 
