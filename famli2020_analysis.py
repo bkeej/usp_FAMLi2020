@@ -44,7 +44,14 @@ def parseNoPers(xmlfile):
 # Saving analysis 
 #
 
-def savetoCSV():
+
+def vvToRow(phrase):
+	pass
+
+def noPersToRow(phrase):
+	pass
+
+def saveToCSV():
 	pass
 
 #
