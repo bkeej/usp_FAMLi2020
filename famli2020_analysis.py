@@ -17,7 +17,7 @@ xmlFiles = os.listdir(corpusDir)
 # Parsers
 #
 
-## Takes and IGT-XML file and returns a list of phrase ids of phrases that have adjacent verbs (ie., VI / VT)
+## Takes an IGT-XML file and returns a list of phrase ids of phrases that have adjacent verbs (ie., VI / VT)
 def parseVV(xmlfile): 
 	verbTags = ["VT", "VI"]
 	pharseMatch = []
@@ -29,7 +29,7 @@ def parseVV(xmlfile):
 				pharseMatch.append(phrase.get("ph_id"))
 	return pharseMatch
 
-## Takes and IGT-XML file and returns a list of phrase ids of phrases transitive verbs, but no person-marking.
+## Takes an IGT-XML file and returns a list of phrase ids of phrases with transitive verbs, but no person-marking.
 def parseNoPers(xmlfile):
 	pharseMatch = []
 	tree = ET.parse(xmlfile) 
