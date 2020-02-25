@@ -24,8 +24,8 @@ def parseVV(xmlfile):
 	tree = ET.parse(xmlfile) 
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
-		for x, y in zip(phrase, phrase[1:]): # trick to get adject pairs in phrase, i.e., pos tags
-			if x.get("text") in verbTags and y.get("text") in verbTags:
+		for x, y in zip(phrase, phrase[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
+			if x.get("text") in verbTags and y.get("text") in verbTags: # True if adjacent verb tags
 				pharseMatch.append(phrase.get("ph_id"))
 	return pharseMatch
 
@@ -36,14 +36,13 @@ def parseNoPers(xmlfile):
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
 		for x, y in zip(phrase, phrase[1:]): # trick to get adject pairs in phrase, i.e., pos tags
-			if y.get("text") == "VT" and not x.get("text") == "PERS":
+			if y.get("text") == "VT" and not x.get("text") == "PERS": # True if any VT ever not follows PERS
 				pharseMatch.append(phrase.get("ph_id"))
 	return pharseMatch
 
 #
 # Saving analysis 
 #
-
 
 def vvToRow(phrase):
 	pass
