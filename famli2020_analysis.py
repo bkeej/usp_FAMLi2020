@@ -27,6 +27,10 @@ def parseVV(xmlfile):
 
 # Saving analysis
 
+## Takes and IGT-XML file and returns a list of phrase ids of phrases transitive verbs, but not person-marking.
+def parseNoPers(xmlfile):
+	pass
+
 def savetoCSV():
 	pass
 
