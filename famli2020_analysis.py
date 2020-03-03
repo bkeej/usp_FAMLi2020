@@ -26,8 +26,6 @@ def vv_match(phrase):
 	pos = phrase.findall("pos") #return all pos tags under phrase
 	for p in pos:
 		if p.get("orig_cls") != None:
-			pass
-		else:
 			pos.remove(p)
 	for p1, p2 in zip(pos, pos[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
 		if p1.get("text") in verb_tags and p2.get("text") in verb_tags: # True if adjacent verb tags
@@ -43,8 +41,6 @@ def parse_vv(xmlfile):
 	tree = ET.parse(xmlfile) 
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
-	# 	for x, y in zip(phrase, phrase[1:]): # trick to get adjacent pairs in phrase, i.e., pos tags
-	# 		if x.get("text") in verb_tags and y.get("text") in verb_tags: # True if adjacent verb tags
 		matches = vv_match(phrase)
 		if len(matches) > 0:
 			for m in matches:
@@ -80,7 +76,7 @@ def parse_no_pers(xmlfile):
 # Main
 #
 
-test = corpus_dir + xml_files[2]
+test = corpus_dir + xml_files[3]
 
 def main():
 	with open(data_dir + "VV.csv", "w") as csvfile:
