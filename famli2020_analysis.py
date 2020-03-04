@@ -56,6 +56,7 @@ def parse_vv(xmlfile):
 					pass
 	return rows 
 
+
 ## Takes an IGT-XML file and returns a list of phrase objects with transitive verbs, but no person-marking.
 ## CHECK: THIS MIGHT BE RETURNING SOME FALSE POSITIVES
 def parse_no_pers(xmlfile):
@@ -64,17 +65,20 @@ def parse_no_pers(xmlfile):
 	root = tree.getroot()
 	for phrase in root.findall("./body/postags/phrase"):
 		for x, y in zip(phrase, phrase[1:]): # trick to get adject pairs in phrase, i.e., pos tags
-			if y.get("text") == "VT" and x.get("text") != "PERS": # True if any VT ever not follows PERS
-				try:
-					row = {"tx_title": None, "phrase_id": None, "v": None, "sentence": None, "translation": None}
-					row["tx_title"] = root.get("title")
-					row["phrase_id"] = phrase.get("ph_id")
-					row["v"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text") 
-					row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text
-					row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text
-					rows.append(row)
-				except AttributeError:
-					pass 
+			try:
+				if y.get("text") == "VT" and x.get("text")[0] != "E": # True if any VT ever not follows an ergative
+					try:
+						row = {"tx_title": None, "phrase_id": None, "v": None, "sentence": None, "translation": None}
+						row["tx_title"] = root.get("title")
+						row["phrase_id"] = phrase.get("ph_id")
+						row["v"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text") 
+						row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text.strip()
+						row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text.strip()
+						rows.append(row)
+					except AttributeError:
+						pass 
+			except IndexError:
+				pass
 	return rows
 
 #
@@ -89,6 +93,13 @@ def main():
 		writer.writeheader()
 		for xmlfile in xml_files:
 			for row in parse_vv(corpus_dir + xmlfile):
+				writer.writerow(row)
+	with open(data_dir + "noPERS.csv", "w") as csvfile:
+		fieldnames = ["tx_title", "phrase_id", "v", "sentence", "translation"]
+		writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
+		writer.writeheader()
+		for xmlfile in xml_files:
+			for row in parse_no_pers(corpus_dir + xmlfile):
 				writer.writerow(row)
 
 if __name__ == "__main__":
