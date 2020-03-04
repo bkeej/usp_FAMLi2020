@@ -36,7 +36,6 @@ def vv_match(phrase):
 ## Takes an IGT-XML file and returns a list of dictionaries characterizing 
 ## sentences with adjacent verbs prepped for adding to CSV.
 def parse_vv(xmlfile): 
-	verb_tags = ["VT", "VI"]
 	rows = []
 	tree = ET.parse(xmlfile) 
 	root = tree.getroot()
@@ -44,14 +43,17 @@ def parse_vv(xmlfile):
 		matches = vv_match(phrase)
 		if len(matches) > 0:
 			for m in matches:
-				row = {"tx_title": None, "phrase_id": None, "v1": None, "v2": None, "sentence": None, "translation": None}
-				row["tx_title"] = root.get("title")
-				row["phrase_id"] = phrase.get("ph_id")
-				row["v1"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + m[0].get("morph_ref") + "']").get("text") 
-				row["v2"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + m[1].get("morph_ref") + "']").get("text")
-				row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text.strip()
-				row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text.strip()
-				rows.append(row)
+				try:
+					row = {"tx_title": None, "phrase_id": None, "v1": None, "v2": None, "sentence": None, "translation": None}
+					row["tx_title"] = root.get("title")
+					row["phrase_id"] = phrase.get("ph_id")
+					row["v1"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + m[0].get("morph_ref") + "']").get("text") 
+					row["v2"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + m[1].get("morph_ref") + "']").get("text")
+					row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text.strip()
+					row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text.strip()
+					rows.append(row)
+				except AttributeError:
+					pass
 	return rows 
 
 ## Takes an IGT-XML file and returns a list of phrase objects with transitive verbs, but no person-marking.
@@ -63,20 +65,23 @@ def parse_no_pers(xmlfile):
 	for phrase in root.findall("./body/postags/phrase"):
 		for x, y in zip(phrase, phrase[1:]): # trick to get adject pairs in phrase, i.e., pos tags
 			if y.get("text") == "VT" and x.get("text") != "PERS": # True if any VT ever not follows PERS
-				row = {"tx_title": None, "phrase_id": None, "v": None, "sentence": None, "translation": None}
-				row["tx_title"] = root.get("title")
-				row["phrase_id"] = phrase.get("ph_id")
-				row["v"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text") 
-				row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text
-				row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text
-				rows.append(row)
+				try:
+					row = {"tx_title": None, "phrase_id": None, "v": None, "sentence": None, "translation": None}
+					row["tx_title"] = root.get("title")
+					row["phrase_id"] = phrase.get("ph_id")
+					row["v"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text") 
+					row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text
+					row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text
+					rows.append(row)
+				except AttributeError:
+					pass 
 	return rows
 
 #
 # Main
 #
 
-test = corpus_dir + xml_files[3]
+test = corpus_dir + xml_files[0]
 
 def main():
 	with open(data_dir + "VV.csv", "w") as csvfile:
