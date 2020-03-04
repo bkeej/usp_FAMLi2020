@@ -81,15 +81,15 @@ def parse_no_pers(xmlfile):
 # Main
 #
 
-test = corpus_dir + xml_files[0]
 
 def main():
 	with open(data_dir + "VV.csv", "w") as csvfile:
 		fieldnames = ["tx_title", "phrase_id", "v1", "v2", "sentence", "translation"]
 		writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
 		writer.writeheader()
-		for row in parse_vv(test):
-			writer.writerow(row)
+		for xmlfile in xml_files:
+			for row in parse_vv(corpus_dir + xmlfile):
+				writer.writerow(row)
 
 if __name__ == "__main__":
 	main() 
