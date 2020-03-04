@@ -81,6 +81,29 @@ def parse_no_pers(xmlfile):
 				pass
 	return rows
 
+def parse_E3(xmlfile):
+	rows = []
+	tree = ET.parse(xmlfile) 
+	root = tree.getroot()
+	for phrase in root.findall("./body/postags/phrase"):
+		for x, y in zip(phrase, phrase[1:]): # trick to get adject pairs in phrase, i.e., pos tags
+			try:
+				if y.get("text") == "VT" and x.get("text")[:2] == "E3": # True if any VT ever follows an 3rd ergative
+					try:
+						row = {"tx_title": None, "phrase_id": None, "v": None, "sentence": None, "translation": None}
+						row["tx_title"] = root.get("title")
+						row["phrase_id"] = phrase.get("ph_id")
+						row["v"] = root.find("./body/morphemes/phrase/morph[@morph_id='" + y.get("morph_ref") + "']").get("text") 
+						row["sentence"] = root.find("./body/phrases/phrase[@ph_id='" + phrase.get("ph_id") + "']/plaintext").text.strip()
+						row["translation"] = root.find("./body/translations/phrase[@ph_id='" + phrase.get("ph_id") + "']/trans").text.strip()
+						rows.append(row)
+					except AttributeError:
+						pass 
+			except IndexError:
+				pass
+	return rows
+
+
 #
 # Main
 #
@@ -100,6 +123,13 @@ def main():
 		writer.writeheader()
 		for xmlfile in xml_files:
 			for row in parse_no_pers(corpus_dir + xmlfile):
+				writer.writerow(row)
+	with open(data_dir + "E3.csv", "w") as csvfile:
+		fieldnames = ["tx_title", "phrase_id", "v", "sentence", "translation"]
+		writer = csv.DictWriter(csvfile,fieldnames=fieldnames)
+		writer.writeheader()
+		for xmlfile in xml_files:
+			for row in parse_E3(corpus_dir + xmlfile):
 				writer.writerow(row)
 
 if __name__ == "__main__":
